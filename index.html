@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Витстоун гүүрний симулятор</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+      color: white;
+    }
+    
+    h1 {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 2em;
+      text-shadow: 0 0 15px #00ff00;
+    }
+
+    /* Circuit container with background image */
+    .circuit-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: url('https://assets.onecompiler.app/42ypgxm44/42z3gbkkz/Figure_1.webp');
+      background-size: contain; /* Fit the image to the screen */
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* Overlay to improve contrast of text */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4); /* Darken the background */
+      z-index: 1;
+    }
+
+    /* Wires with glowing effect */
+    .wire {
+      position: absolute;
+      height: 2%;
+      background: linear-gradient(90deg, #00ff00, #004400);
+      animation: flow 2s linear infinite;
+      box-shadow: 0 0 10px #00ff00;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    @keyframes flow {
+      0% {
+        background: linear-gradient(90deg, #004400, #00ff00, #004400);
+      }
+      100% {
+        background: linear-gradient(90deg, #00ff00, #004400, #00ff00);
+      }
+    }
+
+    /* Controls for sliders and output */
+    .controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 16px;
+      color: white;
+      z-index: 2;
+    }
+
+    .controls label {
+      display: block;
+      margin: 10px;
+    }
+
+    .slider {
+      width: 200px;
+    }
+
+    /* Output display */
+    .output {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      color: white;
+      font-size: 16px;
+      z-index: 2;
+    }
+
+    /* Voltage source and voltmeter display */
+    .voltage-source, .voltmeter {
+      position: absolute;
+      font-size: 1.2em;
+      color: white;
+      z-index: 2;
+    }
+
+    /* Footer for image credit */
+    .credit {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #cccccc;
+      font-size: 12px;
+      z-index: 2;
+    }
+
+  </style>
+</head>
+<body>
+
+<h1>Витстоун гүүрний симулятор</h1>
+
+<!-- Overlay to improve text contrast -->
+<div class="overlay"></div>
+
+<!-- Circuit Container -->
+<div class="circuit-container">
+  <!-- Wires: Absolute positioning with animated effect -->
+  <!-- Wire from R1 to R2 -->
+  <div class="wire" id="wire1" style="top: 35%; left: 40%; width: 20%;"></div> <!-- R1 to R2 -->
+  
+  <!-- Wire from R3 to R4 -->
+  <div class="wire" id="wire2" style="top: 60%; left: 40%; width: 20%;"></div> <!-- R3 to R4 -->
+  
+  <!-- Wire from R1 to R3 -->
+  <div class="wire" id="wire3" style="top: 35%; left: 37%; height: 30%;"></div> <!-- R1 to R3 -->
+  
+  <!-- Wire from R2 to R4 -->
+  <div class="wire" id="wire4" style="top: 35%; left: 87%; height: 30%;"></div> <!-- R2 to R4 -->
+  
+  <!-- Wire from voltage source to R1 and R3 -->
+  <div class="wire" id="wire5" style="top: 45%; left: 10%; width: 30%;"></div> <!-- Voltage to R1/R3 -->
+  
+  <!-- Wire from R2/R4 to Voltmeter -->
+  <div class="wire" id="wire6" style="top: 45%; left: 72%; width: 10%;"></div> <!-- R2/R4 to Voltmeter -->
+
+  <!-- Voltage Source (positioned to match schematic) -->
+  <div class="voltage-source" style="top: 38%; left: 5%;">+10V</div>
+
+  <!-- Voltmeter (positioned to match schematic) -->
+  <div class="voltmeter" style="top: 40%; left: 90%;">V</div>
+</div>
+
+<!-- Controls for Resistor Values -->
+<div class="controls">
+  <label for="R1">R1 (Ω): <input type="range" id="R1Slider" min="10" max="1000" value="150" oninput="updateValues()" class="slider"> <span id="R1Value">150</span></label>
+  <label for="R2">R2 (Ω): <input type="range" id="R2Slider" min="10" max="1000" value="50" oninput="updateValues()" class="slider"> <span id="R2Value">50</span></label>
+  <label for="R3">R3 (Ω): <input type="range" id="R3Slider" min="10" max="1000" value="100" oninput="updateValues()" class="slider"> <span id="R3Value">100</span></label>
+  <label for="R4">R4 (Ω): <input type="range" id="R4Slider" min="10" max="1000" value="300" oninput="updateValues()" class="slider"> <span id="R4Value">300</span></label>
+  <label for="R5">R5 (Ω): <input type="range" id="R5Slider" min="10" max="1000" value="250" oninput="updateValues()" class="slider"> <span id="R5Value">250</span></label>
+</div>
+
+<!-- Output Voltage -->
+<div class="output" id="output">Гаралтын хүчдэл: 0.00 V</div>
+
+<!-- Image Credit Footer -->
+<div class="credit">Зураг эх сурвалж: <a href="https://assets.onecompiler.app/42ypgxm44/42z3gbkkz/Figure_1.webp" target="_blank">Зураг 1 - Витстоун гүүрний схем</a></div>
+
+<script>
+  function updateValues() {
+    const R1 = parseFloat(document.getElementById("R1Slider").value);
+    const R2 = parseFloat(document.getElementById("R2Slider").value);
+    const R3 = parseFloat(document.getElementById("R3Slider").value);
+    const R4 = parseFloat(document.getElementById("R4Slider").value);
+    const R5 = parseFloat(document.getElementById("R5Slider").value);
+
+    document.getElementById("R1Value").textContent = R1;
+    document.getElementById("R2Value").textContent = R2;
+    document.getElementById("R3Value").textContent = R3;
+    document.getElementById("R4Value").textContent = R4;
+    document.getElementById("R5Value").textContent = R5;
+
+    // Витстоун гүүрний гаралтын хүчдэл тооцоолох
+    const V = 10; // Хүчдэл эх сурвалж (10V)
+    const Vout = Math.abs((R3 / (R1 + R3)) - (R4 / (R2 + R4))) * V;
+
+    // Гаралтын хүчдэл гаргах
+    document.getElementById("output").textContent = `Гаралтын хүчдэл: ${Vout.toFixed(2)} V`;
+
+    // Хүчдэл гарахтай холбоотой утга
+    const wireColor = Vout > 0 ? "#ff0000" : "#00ff00"; // Хүчдэлээс хамааран утасны өнгө
+    document.querySelectorAll('.wire').forEach(wire => {
+      wire.style.background = wireColor;
+    });
+  }
+
+  // Анхдагч утгаар эхлэх
+  updateValues();
+</script>
+
+</body>
+</html>
